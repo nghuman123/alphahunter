@@ -21,16 +21,16 @@ export interface Stock {
 }
 
 export interface CompounderMetrics {
-  revenueGrowth: number; 
-  grossMargin: number; 
+  revenueGrowth: number;
+  grossMargin: number;
   grossMarginTrend: 'Expanding' | 'Stable' | 'Contracting';
-  ruleOf40: number; 
-  insiderOwnership: number; 
+  ruleOf40: number;
+  insiderOwnership: number;
   founderLed: boolean;
-  dilutionRate: number; 
-  pegRatio: number; 
+  dilutionRate: number;
+  pegRatio: number;
   cashRunway: string;
-  beneishMScore: number; 
+  beneishMScore: number;
 }
 
 export interface Catalyst {
@@ -42,8 +42,104 @@ export interface Catalyst {
   description: string;
 }
 
+export interface MoatThesisAnalysis {
+  moatScore: number;
+  primaryMoatType: string;
+  moatDurability: string;
+  oneLineThesis: string;
+  bullCase: string[];
+  bearCase: string[];
+}
+
 export interface AnalysisResult {
-  markdown: string;
+  ticker: string;
+  score: number;        // finalScore 0–100
+  tier: string;         // "Tier 1" | "Tier 2" | "Tier 3" | "Not Interesting" | "Disqualified"
+  verdict: string;      // "Strong Buy" | "Buy" | "Watch" | "Pass" | "Disqualified"
+
+  price: number;
+
+  // The quantitative + AI breakdown
+  quantScore: number;   // 0–100
+  aiScore: number;      // effective AI contribution (boost - penalties)
+
+  // Flags and bonuses
+  bonuses: string[];    // e.g. ["Growth Bonus", "Capital Efficiency"]
+  riskFlags: {
+    disqualified: boolean;
+    disqualifiedReasons: string[];  // e.g. ["Altman Z-Score -10.9 < 0 (severe distress)"]
+    warnings: string[];             // Beneish, dilution, Altman warning zone, etc.
+    riskPenalty: number;
+  };
+
+  // Narrative from Gemini
+  aiAnalysis: {
+    moat: {
+      score: number;                // 0–100 or 1–10
+      durability: string;           // short text label from Moat agent
+      type: string;                 // [NEW] primary moat type
+    };
+    thesis: string;                 // main investment thesis
+    risks: string[];                // key risk bullets (mapped from bearCase or separate risks)
+    bullCase: string[];             // [NEW]
+    bearCase: string[];             // [NEW]
+  };
+  dataQualityWarnings?: string[];
+  warningFull?: string;
+}
+
+// ... (rest of file)
+
+export interface MultiBaggerAnalysis {
+  ticker: string;
+  companyName: string;
+  sector: SectorType;
+  marketCap: number;
+  price: number;
+
+  // New Score
+  multiBaggerScore: MultiBaggerScore;
+  technicalScore: TechnicalScore;
+  squeezeSetup: SqueezeSetup;
+
+  overallTier: 'Tier 1' | 'Tier 2' | 'Tier 3' | 'Not Interesting' | 'Disqualified';
+  tier: 'Tier 1' | 'Tier 2' | 'Tier 3' | 'Not Interesting' | 'Disqualified'; // Alias for frontend
+  suggestedPositionSize: string;
+
+  // Legacy/Other
+  quantScore?: QuantitativeScore; // Optional/Deprecated
+  riskFlags: RiskFlags;
+  visionaryAnalysis: VisionaryAnalysis;
+  patternMatch: PatternMatch;
+  antigravityResult?: AntigravityResult;
+
+  moatAssessment: 'Wide' | 'Narrow' | 'None';
+  growthThesis: string;
+  catalysts: string[];
+  keyRisks: string[];
+  warnings: string[]; // [NEW] Risk warnings
+
+  finalScore: number;
+  score: number; // Alias for frontend
+  verdict: 'Strong Buy' | 'Buy' | 'Watch' | 'Pass' | 'Disqualified';
+
+  // New fields for AnalysisResult parity
+  aiScore: number;
+  bonuses: string[];
+  aiAnalysis: {
+    moat: {
+      score: number;
+      durability: string;
+      type: string;
+    };
+    thesis: string;
+    risks: string[];
+    bullCase: string[];
+    bearCase: string[];
+  };
+
+  dataQuality: DataQuality;
+  dataTimestamp: string;
   sources: string[];
 }
 
@@ -66,6 +162,8 @@ export interface CompanyProfile {
   isFund: boolean;
   isEtf: boolean;
   ipoDate: string;
+  currency?: string;
+  exchangeShortName?: string;
 }
 
 export interface IncomeStatement {
@@ -176,6 +274,24 @@ export interface StockQuote {
   eps: number | null;
   sharesOutstanding: number;
   priceToSales?: number;
+  name?: string;
+  exchange?: string;
+}
+
+export interface HistoricalPrice {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  adjClose: number;
+  volume: number;
+  unadjustedVolume: number;
+  change: number;
+  changePercent: number;
+  vwap: number;
+  label: string;
+  changeOverTime: number;
 }
 
 // ============ FINNHUB DATA TYPES ============
@@ -231,7 +347,7 @@ export interface QuantitativeScore {
   insiderScore: number;       // 0-15
   valuationScore: number;     // 0-10
   compositeScore: number;     // 0-100
-  
+
   // Underlying data
   revenueGrowth3YrCAGR: number;
   lastQuarterGrowth: number;
@@ -251,10 +367,16 @@ export interface RiskFlags {
   cashRunwayQuarters: number;
   altmanZScore: number;
   shortInterestPct: number;
-  
+
   disqualified: boolean;
   disqualifyReasons: string[];
   warnings: string[];
+  riskPenalty: number; // New field for score deduction
+
+  // New Fields
+  qualityOfEarnings: 'Pass' | 'Fail' | 'Warn';
+  fcfConversionRatio: number; // FCF / Net Income
+  consecutiveNegativeFcfQuarters: number;
 }
 
 export interface VisionaryAnalysis {
@@ -274,27 +396,64 @@ export interface PatternMatch {
   keyDifferences: string[];
 }
 
+import { MultiBaggerScore, TechnicalScore, SqueezeSetup } from './src/types/scoring';
+import { AntigravityResult } from './src/types/antigravity';
+export type { MultiBaggerScore, TechnicalScore, SqueezeSetup, AntigravityResult };
+
 export interface MultiBaggerAnalysis {
   ticker: string;
   companyName: string;
   sector: SectorType;
   marketCap: number;
   price: number;
-  
-  quantScore: QuantitativeScore;
+
+  // New Score
+  multiBaggerScore: MultiBaggerScore;
+  technicalScore: TechnicalScore;
+  squeezeSetup: SqueezeSetup;
+
+  overallTier: 'Tier 1' | 'Tier 2' | 'Tier 3' | 'Not Interesting' | 'Disqualified';
+  tier: 'Tier 1' | 'Tier 2' | 'Tier 3' | 'Not Interesting' | 'Disqualified'; // Alias for frontend
+  suggestedPositionSize: string;
+
+  // Legacy/Other
+  quantScore?: QuantitativeScore; // Optional/Deprecated
   riskFlags: RiskFlags;
   visionaryAnalysis: VisionaryAnalysis;
   patternMatch: PatternMatch;
-  
+  antigravityResult?: AntigravityResult;
+
   moatAssessment: 'Wide' | 'Narrow' | 'None';
   growthThesis: string;
   catalysts: string[];
   keyRisks: string[];
-  
+  warnings: string[]; // [NEW] Risk warnings
+
   finalScore: number;
+  rawScore: number; // [NEW] Unclamped score for debugging
+  score: number; // Alias for frontend
   verdict: 'Strong Buy' | 'Buy' | 'Watch' | 'Pass' | 'Disqualified';
-  
+
+  // New fields for AnalysisResult parity
+  aiScore: number;
+  bonuses: string[];
+  aiAnalysis: {
+    moat: {
+      score: number;
+      durability: string;
+      type: string;
+    };
+    thesis: string;
+    risks: string[];
+    bullCase: string[];
+    bearCase: string[];
+  };
+
   dataQuality: DataQuality;
   dataTimestamp: string;
   sources: string[];
+  dataQualityWarnings?: string[];
+  warningFull?: string;
 }
+
+export * from './src/types/antigravity';

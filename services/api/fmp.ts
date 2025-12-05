@@ -9,19 +9,33 @@ import type {
   CompanyProfile,
   IncomeStatement,
   BalanceSheet,
+  CashFlowStatement,
   KeyMetrics,
   InsiderTrade,
   FinancialGrowth,
-  StockQuote
+  StockQuote,
+  HistoricalPrice
 } from '../../types';
 import { fetchWithRetry, ApiError } from '../utils/retry';
+import { getCache, setCache } from '../utils/cache';
 
-const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
-const API_KEY = import.meta.env.VITE_FMP_API_KEY;
+export interface CompanyMeta {
+  symbol: string;
+  name: string | null;
+  marketCap: number | null;
+  currency: string | null;
+  exchange: string | null;
+  sector: string | null;
+  industry: string | null;
+}
 
-// Simple in-memory cache
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const FMP_BASE = process.env.FMP_BASE_URL || 'https://financialmodelingprep.com/stable';
+const API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_FMP_API_KEY : undefined) || process.env.VITE_FMP_API_KEY;
+
+// Cache TTLs
+const TTL_PROFILE = 30 * 24 * 60 * 60 * 1000; // 30 days
+const TTL_FINANCIALS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const TTL_DEFAULT = 24 * 60 * 60 * 1000; // 24 hours
 
 const validateApiKey = () => {
   if (!API_KEY) {
@@ -30,19 +44,35 @@ const validateApiKey = () => {
   }
 };
 
+const getTtlForEndpoint = (endpoint: string): number => {
+  if (endpoint.includes('/profile')) return TTL_PROFILE;
+  if (endpoint.includes('/income-statement') ||
+    endpoint.includes('/balance-sheet') ||
+    endpoint.includes('/cash-flow') ||
+    endpoint.includes('/key-metrics') ||
+    endpoint.includes('/financial-growth')) return TTL_FINANCIALS;
+  if (endpoint.includes('/quote')) return 0; // Do not cache quotes
+  return TTL_DEFAULT;
+};
+
 const fetchData = async <T>(endpoint: string): Promise<T> => {
   validateApiKey();
 
-  const cacheKey = endpoint;
-  const cached = cache.get(cacheKey);
+  const cacheKey = `fmp_${endpoint}`;
+  const ttl = getTtlForEndpoint(endpoint);
 
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data as T;
+  // Try cache first (if TTL > 0)
+  if (ttl > 0) {
+    const cached = await getCache<T>(cacheKey);
+    if (cached) return cached;
   }
 
   return fetchWithRetry(async () => {
-    const url = `${FMP_BASE}${endpoint}${endpoint.includes('?') ? '&' : '?'}apikey=${API_KEY}`;
+    const hasQuery = endpoint.includes('?');
+    const url = `${FMP_BASE}${endpoint}${hasQuery ? '&' : '?'}apikey=${API_KEY}`;
     console.log(`Fetching FMP: ${endpoint} with key length: ${API_KEY?.length}`);
+    // console.log('[FMP FULL URL]', url); // Debug log
+
     const res = await fetch(url);
 
     if (res.status === 429) {
@@ -71,7 +101,11 @@ const fetchData = async <T>(endpoint: string): Promise<T> => {
       throw new ApiError('UNKNOWN', data['Error Message']);
     }
 
-    cache.set(cacheKey, { data, timestamp: Date.now() });
+    // Write to cache if TTL > 0
+    if (ttl > 0 && data) {
+      await setCache(cacheKey, data, ttl);
+    }
+
     return data as T;
   }, {
     maxRetries: 2,
@@ -83,8 +117,30 @@ const fetchData = async <T>(endpoint: string): Promise<T> => {
 // ============ ENDPOINTS ============
 
 export const getCompanyProfile = async (symbol: string): Promise<CompanyProfile | null> => {
+  if (API_KEY === 'dummy_key') {
+    return {
+      symbol,
+      companyName: "Apple Inc.",
+      description: "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories.",
+      sector: "Technology",
+      industry: "Consumer Electronics",
+      ceo: "Tim Cook",
+      ipoDate: "1980-12-12",
+      website: "https://www.apple.com",
+      currency: "USD",
+      exchange: "NASDAQ",
+      country: "US",
+      isEtf: false,
+      isActivelyTrading: true,
+      mktCap: 2500000000000,
+      price: 150,
+      changes: 2.5,
+      changesPercentage: "(+1.7%)",
+      image: ""
+    } as unknown as CompanyProfile;
+  }
   try {
-    const data = await fetchData<CompanyProfile[]>(`/profile/${symbol}`);
+    const data = await fetchData<CompanyProfile[]>(`/profile?symbol=${symbol}`);
     return data?.[0] || null;
   } catch (error) {
     console.error(`Error fetching profile for ${symbol}:`, error);
@@ -94,8 +150,35 @@ export const getCompanyProfile = async (symbol: string): Promise<CompanyProfile 
 };
 
 export const getQuote = async (symbol: string): Promise<StockQuote | null> => {
+  if (API_KEY === 'dummy_key') {
+    return {
+      symbol,
+      price: 150,
+      changes: 2.5,
+      change: 2.5,
+      changesPercentage: 1.7,
+      marketCap: 2500000000000,
+      pe: 25,
+      yearHigh: 160,
+      yearLow: 120,
+      dayHigh: 152,
+      dayLow: 148,
+      priceAvg50: 145,
+      priceAvg200: 140,
+      volume: 50000000,
+      avgVolume: 60000000,
+      open: 148,
+      previousClose: 147.5,
+      eps: 6,
+      earningsAnnouncement: "2025-01-28",
+      sharesOutstanding: 16000000000,
+      timestamp: Date.now(),
+      name: "Apple Inc.",
+      priceToSalesRatio: 7 // Added for scoring
+    } as unknown as StockQuote;
+  }
   try {
-    const data = await fetchData<StockQuote[]>(`/quote/${symbol}`);
+    const data = await fetchData<StockQuote[]>(`/quote?symbol=${symbol}`);
     return data?.[0] || null;
   } catch (error) {
     console.error(`Error fetching quote for ${symbol}:`, error);
@@ -104,9 +187,29 @@ export const getQuote = async (symbol: string): Promise<StockQuote | null> => {
   }
 };
 
+export async function getHistoricalPrice(symbol: string, days: number = 365): Promise<HistoricalPrice[]> {
+  return fetchData<HistoricalPrice[]>(
+    `/historical-price-full?symbol=${symbol}&timeseries=${days}`,
+  );
+}
+
 export const getIncomeStatements = async (symbol: string, limit = 12): Promise<IncomeStatement[]> => {
+  if (API_KEY === 'dummy_key') {
+    return Array(5).fill(null).map((_, i) => ({
+      date: `2024-0${5 - i}-01`, symbol,
+      revenue: 1000000000 * (1 + i * 0.1), // Growing revenue
+      grossProfit: 400000000, grossProfitRatio: 0.4,
+      operatingIncome: 200000000, operatingIncomeRatio: 0.2,
+      netIncome: 150000000, netIncomeRatio: 0.15,
+      ebitda: 250000000, ebitdaratio: 0.25,
+      eps: 1.5, epsdiluted: 1.5,
+      weightedAverageShsOut: 100000000, weightedAverageShsOutDil: 100000000,
+      fillingDate: `2024-0${5 - i}-15`, acceptedDate: `2024-0${5 - i}-15`,
+      period: 'Q' + (4 - i), link: '', finalLink: ''
+    }));
+  }
   try {
-    const data = await fetchData<IncomeStatement[]>(`/income-statement/${symbol}?period=quarter&limit=${limit}`);
+    const data = await fetchData<IncomeStatement[]>(`/income-statement?symbol=${symbol}&period=quarter&limit=${limit}`);
     return data || [];
   } catch (error) {
     console.error(`Error fetching income stmt for ${symbol}:`, error);
@@ -116,8 +219,20 @@ export const getIncomeStatements = async (symbol: string, limit = 12): Promise<I
 };
 
 export const getBalanceSheets = async (symbol: string, limit = 12): Promise<BalanceSheet[]> => {
+  if (API_KEY === 'dummy_key') {
+    return Array(5).fill(null).map((_, i) => ({
+      date: `2024-0${5 - i}-01`, symbol,
+      cashAndCashEquivalents: 500000000, shortTermInvestments: 100000000,
+      totalCurrentAssets: 1000000000, totalAssets: 2000000000,
+      totalCurrentLiabilities: 500000000, totalLiabilities: 1000000000,
+      totalStockholdersEquity: 1000000000, retainedEarnings: 500000000,
+      totalDebt: 400000000, netDebt: -200000000,
+      fillingDate: `2024-0${5 - i}-15`, acceptedDate: `2024-0${5 - i}-15`,
+      period: 'Q' + (4 - i), link: '', finalLink: ''
+    }));
+  }
   try {
-    const data = await fetchData<BalanceSheet[]>(`/balance-sheet-statement/${symbol}?period=quarter&limit=${limit}`);
+    const data = await fetchData<BalanceSheet[]>(`/balance-sheet-statement?symbol=${symbol}&period=quarter&limit=${limit}`);
     return data || [];
   } catch (error) {
     console.error(`Error fetching balance sheet for ${symbol}:`, error);
@@ -126,9 +241,30 @@ export const getBalanceSheets = async (symbol: string, limit = 12): Promise<Bala
   }
 };
 
+export const getCashFlowStatements = async (symbol: string, limit = 12): Promise<CashFlowStatement[]> => {
+  if (API_KEY === 'dummy_key') {
+    return Array(5).fill(null).map((_, i) => ({
+      date: `2024-0${5 - i}-01`, symbol,
+      operatingCashFlow: 200000000, capitalExpenditure: -50000000,
+      freeCashFlow: 150000000, stockBasedCompensation: 20000000,
+      netIncome: 150000000,
+      fillingDate: `2024-0${5 - i}-15`, acceptedDate: `2024-0${5 - i}-15`,
+      period: 'Q' + (4 - i), link: '', finalLink: ''
+    }));
+  }
+  try {
+    const data = await fetchData<CashFlowStatement[]>(`/cash-flow-statement?symbol=${symbol}&period=quarter&limit=${limit}`);
+    return data || [];
+  } catch (error) {
+    console.error(`Error fetching cash flow for ${symbol}:`, error);
+    if (error instanceof ApiError && error.code === 'MISSING_KEY') throw error;
+    return [];
+  }
+};
+
 export const getKeyMetrics = async (symbol: string): Promise<KeyMetrics | null> => {
   try {
-    const data = await fetchData<KeyMetrics[]>(`/key-metrics-ttm/${symbol}`);
+    const data = await fetchData<KeyMetrics[]>(`/key-metrics-ttm?symbol=${symbol}`);
     return data?.[0] || null;
   } catch (error) {
     if (error instanceof ApiError && error.code === 'MISSING_KEY') throw error;
@@ -138,7 +274,7 @@ export const getKeyMetrics = async (symbol: string): Promise<KeyMetrics | null> 
 
 export const getFinancialGrowth = async (symbol: string): Promise<FinancialGrowth | null> => {
   try {
-    const data = await fetchData<FinancialGrowth[]>(`/financial-growth/${symbol}?limit=1`);
+    const data = await fetchData<FinancialGrowth[]>(`/financial-growth?symbol=${symbol}&limit=1`);
     return data?.[0] || null;
   } catch (error) {
     if (error instanceof ApiError && error.code === 'MISSING_KEY') throw error;
@@ -171,9 +307,50 @@ export const getStockScreener = async (params: {
     if (params.exchange) query.set('exchange', params.exchange);
     query.set('limit', (params.limit || 100).toString());
 
+    // Screener might still be on v3 or have a different stable path, assuming stable for now or v3 fallback if needed.
+    // Checking docs: Screener is usually /stock-screener.
     return await fetchData<any[]>(`/stock-screener?${query.toString()}`);
   } catch (error) {
     console.error('Screener fetch error:', error);
     return [];
+  }
+};
+
+export const getCompanyMetaFromFmp = async (symbol: string): Promise<CompanyMeta | null> => {
+  try {
+    // Prefer /profile; fall back to /quote if profile is empty.
+    const profile = await fetchData<CompanyProfile[]>(`/profile?symbol=${symbol}`);
+    if (profile && profile.length > 0) {
+      const p = profile[0];
+      return {
+        symbol: p.symbol ?? symbol,
+        name: p.companyName ?? null,
+        marketCap: typeof p.mktCap === "number" ? p.mktCap : null,
+        currency: p.currency ?? null,
+        exchange: p.exchangeShortName ?? p.exchange ?? null,
+        sector: p.sector ?? null,
+        industry: p.industry ?? null,
+      };
+    }
+
+    // Optional fallback to quote
+    const quote = await fetchData<StockQuote[]>(`/quote?symbol=${symbol}`);
+    if (quote && quote.length > 0) {
+      const q = quote[0];
+      return {
+        symbol: q.symbol ?? symbol,
+        name: q.name ?? null,
+        marketCap: typeof q.marketCap === "number" ? q.marketCap : null,
+        currency: null, // Quote doesn't usually have currency
+        exchange: q.exchange ?? null,
+        sector: null, // Quote doesn't have sector
+        industry: null,
+      };
+    }
+
+    return null;
+  } catch (err) {
+    console.error(`[FMP] getCompanyMetaFromFmp error for ${symbol}:`, err);
+    return null;
   }
 };

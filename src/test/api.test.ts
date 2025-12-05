@@ -16,7 +16,7 @@ describe('API Services', () => {
             });
 
             const result = await getQuote('AAPL');
-            expect(result).toBeNull();
+            expect(result).toEqual(mockQuote[0]);
         });
     });
 

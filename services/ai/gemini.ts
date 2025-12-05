@@ -1,44 +1,114 @@
-/**
- * Gemini AI Module
- * ONLY used for qualitative analysis that requires NLP:
- * - Visionary CEO scoring
- * - Catalyst extraction
- * - Sentiment analysis
- * - Pattern matching explanation
- * - Financial Data Estimation (Fallback)
- */
-
 import { GoogleGenAI } from "@google/genai";
-import type { VisionaryAnalysis, PatternMatch, SectorType } from '../../types';
+import type { VisionaryAnalysis, PatternMatch, SectorType, MoatThesisAnalysis, AntigravityResult } from '../../types';
+import { ANTIGRAVITY_SYSTEM_PROMPT } from './prompts/antigravityPrompt';
 
-// Initialize safely to prevent crash if API key is missing
+// --- CONFIGURATION ---
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.API_KEY;
+if (!GEMINI_API_KEY) console.warn("GEMINI_API_KEY is not set");
+
+// [CRITICAL FIX] Use specific stable model version, not 'latest'
+const GEMINI_MODEL = "gemini-2.5-flash";
+
 let ai: any;
 try {
-  ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'dummy_key' });
+  ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY || 'dummy_key' });
 } catch (e) {
   console.warn("Gemini AI initialization failed:", e);
 }
 
-// ============ VISIONARY ANALYSIS ============
+// --- HELPER: Nuclear JSON Parser ---
+export function parseJSON<T = any>(raw: string): T | null {
+  if (!raw) return null;
 
-export const analyzeVisionaryLeadership = async (
-  ticker: string,
-  ceoName: string
-): Promise<VisionaryAnalysis> => {
-  
-  const prompt = `
-    Analyze the leadership communication style for ${ticker} (CEO: ${ceoName}).
-    
-    Search for: CEO letters to shareholders, earnings call transcripts, investor presentations, interviews.
-    
-    Using the "Bezos Test" framework, score each dimension 1-10:
-    
-    1. **Long-Term Orientation**: Does leadership use "years/decades" or "quarters/guidance"?
-    2. **Customer Obsession**: Focus on customers vs competitors?
-    3. **Innovation Focus**: R&D emphasis, new product vision?
-    4. **Capital Allocation Clarity**: Clear philosophy on reinvestment vs dividends/buybacks?
-    
-    Return ONLY valid JSON:
+  try {
+    // 1. Remove Markdown code blocks entirely
+    let text = raw.replace(/```json/g, '').replace(/```/g, '');
+
+    // 2. Find the first '{' or '[' to ignore preambles
+    const firstBrace = text.indexOf('{');
+    const firstBracket = text.indexOf('[');
+
+    let start = -1;
+    let end = -1;
+
+    // Detect if Object or Array
+    if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+      start = firstBrace;
+      end = text.lastIndexOf('}');
+    } else if (firstBracket !== -1) {
+      start = firstBracket;
+      end = text.lastIndexOf(']');
+    }
+
+    if (start !== -1 && end !== -1) {
+      text = text.substring(start, end + 1);
+    }
+
+    // 3. "Nuclear" Clean: Remove all newlines and tabs (JSON doesn't need them)
+    // This fixes "Invalid control character" errors inside strings
+    text = text.replace(/[\r\n\t]+/g, ' ');
+
+    // 4. Fix common AI JSON syntax errors
+    text = text
+      .replace(/,\s*}/g, '}')   // Trailing comma in object
+      .replace(/,\s*]/g, ']')   // Trailing comma in array
+      .replace(/\\(?!["\\/bfnrtu])/g, '\\\\'); // Escape bad backslashes
+
+    return JSON.parse(text) as T;
+  } catch (err) {
+    // Only log if it's not a "safe" failure
+    console.error(`[Gemini] JSON Parse Failed. Preview: ${raw.substring(0, 50)}...`);
+    return null;
+  }
+}
+
+// Config to enforce JSON
+const JSON_CONFIG = {
+  responseMimeType: "application/json"
+};
+
+// Strict JSON System Prompt
+const STRICT_JSON_SYSTEM_PROMPT = `
+You are a backend analysis engine used only by another program.
+The program will CRASH if you do not follow these rules exactly.
+
+Your ONLY job is to return a SINGLE VALID JSON OBJECT that matches the schema you are given.
+
+ABSOLUTE OUTPUT RULES:
+
+1. You MUST return exactly ONE JSON object.
+   - No markdown, no prose, no comments.
+   - Do NOT wrap the JSON in \`\`\` or \`\`\`json.
+   - The first non-whitespace character in your entire reply MUST be "{".
+   - The last non-whitespace character in your entire reply MUST be "}".
+
+2. VALID JSON ONLY
+   - Use standard JSON.
+   - All keys and string values MUST use double quotes.
+   - Allowed types: string, number, boolean, null, array, object.
+   - Do NOT use NaN, Infinity, -Infinity, or undefined.
+   - Do NOT use trailing commas.
+
+3. SCHEMA COMPLIANCE
+   - You will be given a schema in text form.
+   - You MUST include ALL required keys.
+   - Do NOT rename, remove, or add keys.
+   - If unsure of a value, still include the key and use null, 0, false, "" or [] as appropriate.
+   - Keep text fields concise and factual.
+     Do NOT write meta-text like "It is difficult to say" or "As an AI model".
+
+4. BE DECISIVE
+   - Never say you "cannot answer" inside a field.
+   - Always give your best estimate, even if uncertainty is high.
+   - If data is truly insufficient, write "Insufficient data" in the appropriate string field, but STILL return valid JSON.
+
+Reply with ONLY the JSON object and nothing else.
+`;
+
+// ============ AI FUNCTIONS ============
+
+export const analyzeVisionaryLeadership = async (ticker: string, ceoName: string): Promise<VisionaryAnalysis & { error?: string }> => {
+  const schema = `
     {
       "longTermScore": number,
       "customerScore": number,
@@ -49,101 +119,35 @@ export const analyzeVisionaryLeadership = async (
       "explanation": "Brief summary of findings"
     }
   `;
-  
+  const task = `Analyze leadership for ${ticker} (CEO: ${ceoName}). Score 1-10 on Bezos Test dimensions.`;
+
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-        systemInstruction: "You are analyzing CEO communication patterns. Be objective and data-driven. Return only JSON.",
-      },
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [{ role: "user", parts: [{ text: `TASK: ${task}\n\nSCHEMA:\n${schema}` }] }],
+      config: JSON_CONFIG
     });
-    
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("Visionary Analysis Error:", error);
+    const parsed = parseJSON<VisionaryAnalysis>(res.text || "{}");
     return {
-      longTermScore: 5,
-      customerScore: 5,
-      innovationScore: 5,
-      capitalScore: 5,
-      totalVisionaryScore: 5,
-      ceoName,
-      explanation: "Analysis unavailable"
+      longTermScore: parsed?.longTermScore ?? 5,
+      customerScore: parsed?.customerScore ?? 5,
+      innovationScore: parsed?.innovationScore ?? 5,
+      capitalScore: parsed?.capitalScore ?? 5,
+      totalVisionaryScore: parsed?.totalVisionaryScore ?? 5,
+      ceoName: parsed?.ceoName || ceoName,
+      explanation: parsed?.explanation || "AI Error"
+    };
+  } catch (e) {
+    return {
+      longTermScore: 5, customerScore: 5, innovationScore: 5, capitalScore: 5, totalVisionaryScore: 5, ceoName, explanation: "System Error",
+      error: "GEMINI_ERROR"
     };
   }
 };
 
-// ============ CATALYST EXTRACTION ============
-
-export const extractCatalysts = async (ticker: string): Promise<string[]> => {
-  const prompt = `
-    Find specific upcoming catalysts for ${ticker} stock in the next 12 months.
-    
-    Search for:
-    - Earnings dates
-    - FDA approval dates (PDUFA)
-    - Product launch dates
-    - Contract announcements
-    - Conference presentations
-    - Regulatory decisions
-    
-    Return ONLY a JSON array of strings with specific dates where possible:
-    ["Q4 2024 Earnings: Jan 28, 2025", "FDA PDUFA Date: March 15, 2025", ...]
-    
-    If no catalysts found, return: ["No specific catalysts identified"]
-  `;
-  
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-      },
-    });
-    
-    const text = response.text || "[]";
-    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("Catalyst Extraction Error:", error);
-    return ["Catalyst data unavailable"];
-  }
-};
-
-// ============ PATTERN MATCHING ============
-
-export const findHistoricalPattern = async (
-  ticker: string,
-  sector: SectorType,
-  marketCap: number,
-  revenueGrowth: number,
-  grossMargin: number
-): Promise<PatternMatch> => {
-  
-  const prompt = `
-    Compare ${ticker} to historical 100-baggers at a similar stage.
-    
-    Current Profile:
-    - Sector: ${sector}
-    - Market Cap: $${(marketCap / 1e9).toFixed(1)}B
-    - Revenue Growth: ${revenueGrowth.toFixed(1)}%
-    - Gross Margin: ${grossMargin.toFixed(1)}%
-    
-    Historical comparisons to consider:
-    - Amazon (2001): E-commerce, negative earnings, massive TAM
-    - Tesla (2012): Hardware with software margins, visionary CEO
-    - Apple (2003): Product pivot, ecosystem building
-    - Monster Beverage (2005): Consumer, high margins, niche dominance
-    - Nvidia (2016): AI/GPU infrastructure
-    
-    Return ONLY valid JSON:
+export const findHistoricalPattern = async (ticker: string, sector: SectorType, marketCap: number, revenueGrowth: number, grossMargin: number): Promise<PatternMatch & { error?: string }> => {
+  const schema = `
     {
       "similarTo": "Company Name (Year)",
       "matchScore": number 0-100,
@@ -151,126 +155,231 @@ export const findHistoricalPattern = async (
       "keyDifferences": ["difference 1", "difference 2"]
     }
   `;
-  
+  const task = `Compare ${ticker} (Sector: ${sector}, Cap: $${(marketCap / 1e9).toFixed(1)}B, Growth: ${revenueGrowth}%, GM: ${grossMargin}%) to historical winners.`;
+
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-      },
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [{ role: "user", parts: [{ text: `TASK: ${task}\n\nSCHEMA:\n${schema}` }] }],
+      config: JSON_CONFIG
     });
-    
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("Pattern Match Error:", error);
+    const parsed = parseJSON<PatternMatch>(res.text || "{}");
     return {
-      similarTo: "Unknown",
-      matchScore: 0,
-      keyParallels: [],
-      keyDifferences: []
+      similarTo: parsed?.similarTo || "None",
+      matchScore: parsed?.matchScore ?? 0,
+      keyParallels: Array.isArray(parsed?.keyParallels) ? parsed.keyParallels : [],
+      keyDifferences: Array.isArray(parsed?.keyDifferences) ? parsed.keyDifferences : []
+    };
+  } catch (e) {
+    return {
+      similarTo: "None", matchScore: 0, keyParallels: [], keyDifferences: [],
+      error: "GEMINI_ERROR"
     };
   }
 };
 
-// ============ MOAT & THESIS ============
-
-export const analyzeMoatAndThesis = async (
-  ticker: string,
-  companyDescription: string
-): Promise<{ moat: 'Wide' | 'Narrow' | 'None'; thesis: string; risks: string[] }> => {
-  
-  const prompt = `
-    Analyze the economic moat and investment thesis for ${ticker}.
-    
-    Company: ${companyDescription.substring(0, 500)}
-    
-    Search for recent information about:
-    1. Competitive advantages (network effects, switching costs, patents, brand)
-    2. Pricing power evidence
-    3. Key risks and threats
-    
-    Return ONLY valid JSON:
+export const analyzeMoatAndThesis = async (ticker: string, description: string): Promise<MoatThesisAnalysis & { error?: string }> => {
+  const schema = `
     {
-      "moat": "Wide" | "Narrow" | "None",
-      "thesis": "2-3 sentence growth thesis",
-      "risks": ["risk 1", "risk 2", "risk 3"]
+      "moatScore": number,
+      "primaryMoatType": "string",
+      "moatDurability": "string",
+      "oneLineThesis": "string",
+      "bullCase": ["string", "string"],
+      "bearCase": ["string", "string"]
     }
   `;
-  
+  const task = `Analyze moat for ${ticker}. Score 1-10.`;
+
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-      },
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [{ role: "user", parts: [{ text: `TASK: ${task}\n\nSCHEMA:\n${schema}` }] }],
+      config: JSON_CONFIG
     });
-    
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("Moat Analysis Error:", error);
+    const parsed = parseJSON<MoatThesisAnalysis>(res.text || "{}");
     return {
-      moat: 'None',
-      thesis: "Analysis unavailable",
-      risks: ["Unknown risks"]
+      moatScore: parsed?.moatScore ?? 0,
+      primaryMoatType: parsed?.primaryMoatType || "None",
+      moatDurability: parsed?.moatDurability || "None",
+      oneLineThesis: parsed?.oneLineThesis || "Error",
+      bullCase: Array.isArray(parsed?.bullCase) ? parsed.bullCase : [],
+      bearCase: Array.isArray(parsed?.bearCase) ? parsed.bearCase : []
+    };
+  } catch (e) {
+    return {
+      moatScore: 0, primaryMoatType: "None", moatDurability: "None", oneLineThesis: "Error", bullCase: [], bearCase: [],
+      error: "GEMINI_ERROR"
     };
   }
 };
 
-// ============ FINANCIAL ESTIMATION (FALLBACK) ============
+export const extractCatalysts = async (ticker: string): Promise<string[]> => {
+  const schema = `["Event 1", "Event 2"]`;
+  const task = `Find upcoming catalysts for ${ticker} (Earnings, FDA, Product Launches).`;
 
-export const getFinancialEstimates = async (ticker: string): Promise<{
-  revenueGrowth3Y: number;
-  grossMargin: number;
-  operatingMargin: number;
-  returnOnEquity: number;
-}> => {
-  const prompt = `
-    Search for the latest financial metrics for ${ticker} stock.
-    I need estimates for:
-    1. 3-Year Revenue CAGR (Growth Rate)
-    2. Gross Margin %
-    3. Operating Margin %
-    4. Return on Equity (ROE) %
-    
-    Return ONLY valid JSON with numeric values (no % signs):
+  try {
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [{ role: "user", parts: [{ text: `TASK: ${task}\n\nSCHEMA:\n${schema}` }] }],
+      config: JSON_CONFIG
+    });
+    return parseJSON<string[]>(res.text || "[]") || ["No specific catalysts found"];
+  } catch (e) { return ["Catalyst data unavailable"]; }
+};
+
+export interface QualitativeAnalysis {
+  tamPenetration: '1-5%' | '<1%' | '5-10%' | '>10%';
+  revenueType: 'Recurring' | 'Consumable' | 'Transactional' | 'One-time' | 'Project-based';
+  catalysts: string[];
+  catalystDensity: 'High' | 'Medium' | 'Low';
+  asymmetryScore: 'High' | 'Medium' | 'Low';
+  pricingPower: 'Strong' | 'Neutral' | 'Weak';
+  reasoning: string;
+}
+
+export const analyzeQualitativeFactors = async (ticker: string, companyName: string, sector: string): Promise<QualitativeAnalysis & { error?: string }> => {
+  const schema = `
+    {
+      "tamPenetration": "1-5%",
+      "revenueType": "Recurring",
+      "catalysts": ["Catalyst 1", "Catalyst 2"],
+      "catalystDensity": "Medium",
+      "asymmetryScore": "High",
+      "pricingPower": "Strong",
+      "reasoning": "Brief summary."
+    }
+  `;
+  const task = `Qualitative analysis for ${companyName} (${ticker}).`;
+
+  try {
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [{ role: "user", parts: [{ text: `TASK: ${task}\n\nSCHEMA:\n${schema}` }] }],
+      config: JSON_CONFIG
+    });
+    const parsed = parseJSON<QualitativeAnalysis>(res.text || "{}");
+    return {
+      tamPenetration: parsed?.tamPenetration || '5-10%',
+      revenueType: parsed?.revenueType || 'Transactional',
+      catalysts: Array.isArray(parsed?.catalysts) ? parsed.catalysts : [],
+      catalystDensity: parsed?.catalystDensity || 'Low',
+      asymmetryScore: parsed?.asymmetryScore || 'Medium',
+      pricingPower: parsed?.pricingPower || 'Neutral',
+      reasoning: parsed?.reasoning || "Error"
+    };
+  } catch (e) {
+    return {
+      tamPenetration: '5-10%', revenueType: 'Transactional', catalysts: [], catalystDensity: 'Low', asymmetryScore: 'Medium', pricingPower: 'Neutral', reasoning: "Error",
+      error: "GEMINI_ERROR"
+    };
+  }
+};
+
+export const getFinancialEstimates = async (ticker: string) => {
+  const schema = `
     {
       "revenueGrowth3Y": number,
       "grossMargin": number,
       "operatingMargin": number,
       "returnOnEquity": number
     }
-    
-    If data is unavailable, use 0.
   `;
-  
+  const task = `Estimate financials for ${ticker}. Use 0 if unavailable.`;
+
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        tools: [{ googleSearch: {} }],
-      },
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [{ role: "user", parts: [{ text: `TASK: ${task}\n\nSCHEMA:\n${schema}` }] }],
+      config: JSON_CONFIG
     });
-    
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("Financial Estimation Error:", error);
+    const parsed = parseJSON(res.text || "{}");
     return {
-      revenueGrowth3Y: 0,
-      grossMargin: 0,
-      operatingMargin: 0,
-      returnOnEquity: 0
+      revenueGrowth3Y: parsed?.revenueGrowth3Y ?? 0,
+      grossMargin: parsed?.grossMargin ?? 0,
+      operatingMargin: parsed?.operatingMargin ?? 0,
+      returnOnEquity: parsed?.returnOnEquity ?? 0
+    };
+  } catch (e) { return { revenueGrowth3Y: 0, grossMargin: 0, operatingMargin: 0, returnOnEquity: 0 }; }
+};
+
+export const analyzeAntigravity = async (inputData: any): Promise<AntigravityResult> => {
+  try {
+    const res = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      systemInstruction: STRICT_JSON_SYSTEM_PROMPT,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: ANTIGRAVITY_SYSTEM_PROMPT + "\n\n### COMPANY DATA FOR ANALYSIS\n" + JSON.stringify(inputData) }]
+        }
+      ],
+      config: JSON_CONFIG,
+    });
+
+    const parsed = parseJSON<AntigravityResult>(res.text || "{}");
+
+    if (!parsed) throw new Error("JSON Parse Failed");
+
+    return {
+      aiStatus: parsed.aiStatus || 'MONITOR_ONLY',
+      aiTier: parsed.aiTier || 'Not Interesting',
+      aiConviction: parsed.aiConviction || 0,
+      thesisSummary: parsed.thesisSummary || "Analysis failed",
+      bullCase: parsed.bullCase || "",
+      bearCase: parsed.bearCase || "",
+      keyDrivers: Array.isArray(parsed.keyDrivers) ? parsed.keyDrivers : [],
+      warnings: Array.isArray(parsed.warnings) ? parsed.warnings : [], // Legacy
+      timeHorizonYears: parsed.timeHorizonYears || 0,
+      multiBaggerPotential: parsed.multiBaggerPotential || 'LOW',
+      positionSizingHint: parsed.positionSizingHint || 'NONE',
+      notesForUI: parsed.notesForUI || "",
+
+      // New Fields
+      primaryMoatType: parsed.primaryMoatType || 'none',
+      moatScore: typeof parsed.moatScore === 'number' ? parsed.moatScore : 0,
+      tamCategory: parsed.tamCategory || 'medium',
+      tamPenetration: parsed.tamPenetration || 'medium',
+      founderLed: typeof parsed.founderLed === 'boolean' ? parsed.founderLed : false,
+      insiderOwnership: typeof parsed.insiderOwnership === 'number' ? parsed.insiderOwnership : null,
+      warningFlags: Array.isArray(parsed.warningFlags) ? parsed.warningFlags : [],
+      positiveCatalysts: Array.isArray(parsed.positiveCatalysts) ? parsed.positiveCatalysts : [],
+
+      error: null
+    };
+
+  } catch (error) {
+    console.error("Antigravity Analysis Error:", error);
+    return {
+      aiStatus: 'MONITOR_ONLY',
+      aiTier: 'Not Interesting',
+      aiConviction: 0,
+      thesisSummary: "AI Analysis Failed",
+      bullCase: "",
+      bearCase: "",
+      keyDrivers: [],
+      warnings: [],
+      timeHorizonYears: 0,
+      multiBaggerPotential: 'LOW',
+      positionSizingHint: 'NONE',
+      notesForUI: "",
+
+      // Defaults for error case
+      primaryMoatType: 'none',
+      moatScore: 0,
+      tamCategory: 'medium',
+      tamPenetration: 'medium',
+      founderLed: false,
+      insiderOwnership: null,
+      warningFlags: [],
+      positiveCatalysts: [],
+
+      error: "GEMINI_ERROR"
     };
   }
 };

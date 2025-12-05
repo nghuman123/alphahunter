@@ -1,0 +1,713 @@
+[Gemini] Using model: gemini-flash-latest
+Running Golden Test Set Analysis...
+
+-----------------------------------------------------------------------------------------------------------------------------
+| Ticker | Quant | Final | Tier            | Disqualified | Warnings                                      | Expected       |
+-----------------------------------------------------------------------------------------------------------------------------
+[Analyzer] Starting analysis for NVDA...
+Fetching FMP: /quote?symbol=NVDA with key length: 32
+[Analyzer] Starting analysis for CRWD...
+Fetching FMP: /quote?symbol=CRWD with key length: 32
+[Analyzer] Starting analysis for DDOG...
+Fetching FMP: /quote?symbol=DDOG with key length: 32
+[Analyzer] Starting analysis for PLTR...
+Fetching FMP: /quote?symbol=PLTR with key length: 32
+[Analyzer] Starting analysis for ZS...
+Fetching FMP: /quote?symbol=ZS with key length: 32
+Fetching FMP: /insider-trading?symbol=NVDA&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=NVDA&timeseries=365 with key length: 32
+Fetching FMP: /insider-trading?symbol=CRWD&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=CRWD&timeseries=365 with key length: 32
+Fetching FMP: /insider-trading?symbol=DDOG&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=DDOG&timeseries=365 with key length: 32
+Fetching FMP: /insider-trading?symbol=PLTR&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=PLTR&timeseries=365 with key length: 32
+Fetching FMP: /insider-trading?symbol=ZS&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=ZS&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for CrowdStrike Holdings, Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for CrowdStrike Holdings, Inc. Class A Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -2.7958382282732863 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] Financial data fetched for Datadog, Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for Datadog, Inc. Class A Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -2.357564174527418 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] Financial data fetched for Nvidia Corp. Has Financials: true
+[Analyzer] Founder status for Nvidia Corp: true (CEO last name matches company name)
+[RiskDebug] Beneish: -1.0114636687409564 (WARNING)
+[Analyzer] Risk check: WARNINGS (Penalty: -5) [ 'Beneish M-Score -1.01 > -1.78 (possible manipulation)' ]
+[Analyzer] Financial data fetched for Zscaler, Inc. Common Stock. Has Financials: true
+[Analyzer] Founder status for Zscaler, Inc. Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -2.1051521329916048 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] Financial data fetched for Palantir Technologies Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for Palantir Technologies Inc. Class A Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -2.0888434517522034 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] PLTR: ROE=0.17, FCF=0.46, Growth=0.47 -> No Bonus
+[GrowthBonus] PLTR: CAGR3y=35.8%, LastGrowth=47.2%, GM=82.4% -> BONUS APPLIED
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 88/100
+[Analyzer] AI STRONG_PASS boost: +17 (conviction=85%)
+[Analyzer] Complete: PLTR = Strong Buy (Score: 100)
+[DebugScore] PLTR {
+  quantScore: 88,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 85,
+  finalScore: 100
+}
+| PLTR   | 88    | 100   | Tier 1          | NO           |                                               | Tier 2         |
+[Analyzer] Starting analysis for PANW...
+Fetching FMP: /quote?symbol=PANW with key length: 32
+Fetching FMP: /insider-trading?symbol=PANW&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=PANW&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Palo Alto Networks, Inc. Common Stock. Has Financials: true
+[Analyzer] Founder status for Palo Alto Networks, Inc. Common Stock: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.3935708528124233 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] NVDA: ROE=0.83, FCF=0.41, Growth=0.65 -> BONUS APPLIED
+[GrowthBonus] NVDA: CAGR3y=126.1%, LastGrowth=65.2%, GM=73.4% -> BONUS APPLIED
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 97/100
+[Analyzer] AI STRONG_PASS boost: +19 (conviction=95%)
+[Analyzer] Complete: NVDA = Strong Buy (Score: 100)
+[DebugScore] NVDA {
+  quantScore: 97,
+  riskPenalty: -5,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 1',
+  aiConviction: 95,
+  finalScore: 100
+}
+| NVDA   | 97    | 100   | Tier 1          | NO           | Beneish M-Score -1.01 > -1.78 (possible ma... | Tier 1         |
+[Analyzer] Starting analysis for FTNT...
+Fetching FMP: /quote?symbol=FTNT with key length: 32
+Fetching FMP: /insider-trading?symbol=FTNT&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=FTNT&timeseries=365 with key length: 32
+[Analyzer] AI analysis complete
+[CapitalEfficiency] CRWD: ROE=-0.08, FCF=0.25, Growth=0.23 -> No Bonus
+[GrowthBonus] CRWD: CAGR3y=29.0%, LastGrowth=23.5%, GM=73.5% -> BONUS APPLIED
+[Analyzer] Quant score: 78/100
+[Analyzer] AI STRONG_PASS boost: +18 (conviction=90%)
+[Analyzer] Complete: CRWD = Strong Buy (Score: 96)
+[DebugScore] CRWD {
+  quantScore: 78,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 1',
+  aiConviction: 90,
+  finalScore: 96
+}
+| CRWD   | 78    | 96    | Tier 1          | NO           |                                               | Tier 1/2       |
+[Analyzer] Starting analysis for MSFT...
+Fetching FMP: /quote?symbol=MSFT with key length: 32
+Fetching FMP: /insider-trading?symbol=MSFT&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=MSFT&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Microsoft Corp. Has Financials: true
+[Analyzer] Founder status for Microsoft Corp: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.1556118898028997 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] Financial data fetched for Fortinet, Inc.. Has Financials: true
+[Analyzer] Founder status for Fortinet, Inc.: true (CEO last name matches company name)
+[RiskDebug] Beneish: -1.8769568160925048 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] DDOG: ROE=0.03, FCF=0.29, Growth=0.27 -> No Bonus
+[GrowthBonus] DDOG: CAGR3y=26.0%, LastGrowth=26.6%, GM=80.1% -> BONUS APPLIED
+[Analyzer] Quant score: 86/100
+[Analyzer] AI STRONG_PASS boost: +17 (conviction=85%)
+[Analyzer] Complete: DDOG = Strong Buy (Score: 100)
+[DebugScore] DDOG {
+  quantScore: 86,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 1',
+  aiConviction: 85,
+  finalScore: 100
+}
+| DDOG   | 86    | 100   | Tier 1          | NO           |                                               | Tier 1/2       |
+[Analyzer] Starting analysis for AAPL...
+Fetching FMP: /quote?symbol=AAPL with key length: 32
+Fetching FMP: /insider-trading?symbol=AAPL&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=AAPL&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Apple Inc.. Has Financials: true
+[Analyzer] Founder status for Apple Inc.: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.11041665949136 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] ZS: ROE=-0.02, FCF=0.30, Growth=0.23 -> No Bonus
+[GrowthBonus] ZS: CAGR3y=29.4%, LastGrowth=23.2%, GM=76.6% -> BONUS APPLIED
+[Analyzer] Quant score: 83/100
+[Analyzer] AI SOFT_PASS boost: +9 (conviction=75%)
+[Analyzer] Complete: ZS = Strong Buy (Score: 92)
+[DebugScore] ZS {
+  quantScore: 83,
+  riskPenalty: 0,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 75,
+  finalScore: 92
+}
+| ZS     | 83    | 92    | Tier 1          | NO           |                                               | Tier 2/3       |
+[Analyzer] Starting analysis for COST...
+Fetching FMP: /quote?symbol=COST with key length: 32
+Fetching FMP: /insider-trading?symbol=COST&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=COST&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Costco Wholesale Corp. Has Financials: true
+[Analyzer] Founder status for Costco Wholesale Corp: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.487777383919687 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] PANW: ROE=0.13, FCF=0.41, Growth=0.15 -> No Bonus
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 60/100
+[Analyzer] AI SOFT_PASS boost: +9 (conviction=78%)
+[Analyzer] Complete: PANW = Buy (Score: 69)
+[DebugScore] PANW {
+  quantScore: 60,
+  riskPenalty: 0,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 78,
+  finalScore: 69
+}
+| PANW   | 60    | 69    | Tier 2          | NO           |                                               | Tier 1         |
+[Analyzer] Starting analysis for SNOW...
+Fetching FMP: /quote?symbol=SNOW with key length: 32
+Fetching FMP: /insider-trading?symbol=SNOW&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=SNOW&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Snowflake Inc.. Has Financials: true
+[Analyzer] Founder status for Snowflake Inc.: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -2.9555823801024808 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] FTNT: ROE=2.55, FCF=0.31, Growth=0.15 -> BONUS APPLIED
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 70/100
+[Analyzer] AI STRONG_PASS boost: +17 (conviction=85%)
+[Analyzer] Complete: FTNT = Buy (Score: 87)
+[DebugScore] FTNT {
+  quantScore: 70,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 85,
+  finalScore: 87
+}
+| FTNT   | 70    | 87    | Tier 2          | NO           |                                               | Tier 1/2       |
+[Analyzer] Starting analysis for SHOP...
+Fetching FMP: /quote?symbol=SHOP with key length: 32
+Fetching FMP: /insider-trading?symbol=SHOP&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=SHOP&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Shopify Inc. Class A subordinate voting shares. Has Financials: true
+[Analyzer] Founder status for Shopify Inc. Class A subordinate voting shares: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.3779444585928897 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] AAPL: ROE=1.52, FCF=0.24, Growth=0.06 -> No Bonus
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 50/100
+[BoringLargeCapDebug] AAPL: mktCap=4120386034050.0005, ROE=1.52, FCF=0.24, Growth=0.06, isBoring=false
+[Analyzer] AI STRONG_PASS boost: +17 (conviction=85%)
+[Analyzer] Complete: AAPL = Buy (Score: 67)
+[DebugScore] AAPL {
+  quantScore: 50,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 85,
+  finalScore: 67
+}
+| AAPL   | 50    | 67    | Tier 2          | NO           |                                               | Tier 2         |
+[Analyzer] Starting analysis for TSLA...
+Fetching FMP: /quote?symbol=TSLA with key length: 32
+Fetching FMP: /insider-trading?symbol=TSLA&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=TSLA&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Tesla, Inc. Common Stock. Has Financials: true
+[Analyzer] Founder status for Tesla, Inc. Common Stock: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.344752543005844 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] MSFT: ROE=0.29, FCF=0.27, Growth=0.16 -> No Bonus
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 60/100
+[BoringLargeCapDebug] MSFT: mktCap=3656804130036.55, ROE=0.29, FCF=0.27, Growth=0.16, isBoring=false
+[Analyzer] AI STRONG_PASS boost: +19 (conviction=95%)
+[Analyzer] Complete: MSFT = Buy (Score: 79)
+[DebugScore] MSFT {
+  quantScore: 60,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 95,
+  finalScore: 79
+}
+| MSFT   | 60    | 79    | Tier 2          | NO           |                                               | Tier 1/2       |
+[Analyzer] Starting analysis for RKLB...
+Fetching FMP: /quote?symbol=RKLB with key length: 32
+Fetching FMP: /insider-trading?symbol=RKLB&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=RKLB&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Rocket Lab Corporation Common Stock. Has Financials: true
+[Analyzer] Founder status for Rocket Lab Corporation Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -3.066916307783066 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] SNOW: ROE=-0.58, FCF=0.18, Growth=0.28 -> No Bonus
+[GrowthBonus] SNOW: CAGR3y=30.0%, LastGrowth=28.4%, GM=67.5% -> No Bonus
+[Analyzer] Quant score: 56/100
+[Analyzer] AI STRONG_PASS boost: +18 (conviction=88%)
+[Analyzer] Complete: SNOW = Buy (Score: 74)
+[DebugScore] SNOW {
+  quantScore: 56,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 1',
+  aiConviction: 88,
+  finalScore: 74
+}
+| SNOW   | 56    | 74    | Tier 2          | NO           |                                               | Tier 2         |
+[Analyzer] Starting analysis for ABNB...
+Fetching FMP: /quote?symbol=ABNB with key length: 32
+Fetching FMP: /insider-trading?symbol=ABNB&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=ABNB&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Airbnb, Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for Airbnb, Inc. Class A Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -2.090728573810551 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] COST: ROE=0.28, FCF=0.03, Growth=0.08 -> No Bonus
+[Analyzer] Quant score: 47/100
+[BoringLargeCapDebug] COST: mktCap=404884063401.84, ROE=0.28, FCF=0.03, Growth=0.08, isBoring=false
+[Analyzer] AI STRONG_PASS boost: +18 (conviction=92%)
+[Analyzer] Complete: COST = Buy (Score: 65)
+[DebugScore] COST {
+  quantScore: 47,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 92,
+  finalScore: 65
+}
+| COST   | 47    | 65    | Tier 2          | NO           |                                               | Tier 2/3       |
+[Analyzer] Starting analysis for ASML...
+Fetching FMP: /quote?symbol=ASML with key length: 32
+Fetching FMP: /insider-trading?symbol=ASML&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=ASML&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for ASML Holding NV. Has Financials: true
+[Analyzer] Founder status for ASML Holding NV: false (No founder signals detected)
+[RiskDebug] Beneish: -2.2510903877052604 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] SHOP: ROE=0.14, FCF=0.18, Growth=0.30 -> No Bonus
+[GrowthBonus] SHOP: CAGR3y=19.7%, LastGrowth=30.2%, GM=48.9% -> No Bonus
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 50/100
+[Analyzer] AI STRONG_PASS boost: +17 (conviction=85%)
+[Analyzer] Complete: SHOP = Buy (Score: 67)
+[DebugScore] SHOP {
+  quantScore: 50,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 85,
+  finalScore: 67
+}
+| SHOP   | 50    | 67    | Tier 2          | NO           |                                               | Tier 2         |
+[Analyzer] Starting analysis for RGTI...
+Fetching FMP: /quote?symbol=RGTI with key length: 32
+Fetching FMP: /insider-trading?symbol=RGTI&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=RGTI&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Rigetti Computing, Inc. Common Stock. Has Financials: true
+[Analyzer] Founder status for Rigetti Computing, Inc. Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -4.462748699219761 (PASS)
+[Analyzer] Risk check: WARNINGS (Penalty: -10) [ 'Dilution rate 72.5% > 25% (high dilution)' ]
+[Analyzer] AI analysis complete
+[CapitalEfficiency] RKLB: ROE=-0.15, FCF=-0.42, Growth=0.52 -> No Bonus
+[Analyzer] Quant score: 57/100
+[Analyzer] AI SOFT_PASS boost: +8 (conviction=70%)
+[Analyzer] Complete: RKLB = Buy (Score: 65)
+[DebugScore] RKLB {
+  quantScore: 57,
+  riskPenalty: 0,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 70,
+  finalScore: 65
+}
+| RKLB   | 57    | 65    | Tier 2          | NO           |                                               | Tier 2/3       |
+[Analyzer] Starting analysis for SOUN...
+Fetching FMP: /quote?symbol=SOUN with key length: 32
+Fetching FMP: /insider-trading?symbol=SOUN&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=SOUN&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for SoundHound AI, Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for SoundHound AI, Inc. Class A Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: -3.5129374474413457 (PASS)
+[Analyzer] Risk check: WARNINGS (Penalty: -5) [ 'Dilution rate 14.2% > 10% (moderate dilution)' ]
+[Analyzer] AI analysis complete
+[CapitalEfficiency] ABNB: ROE=0.31, FCF=0.38, Growth=0.10 -> No Bonus
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 66/100
+[Analyzer] AI SOFT_PASS boost: +9 (conviction=78%)
+[Analyzer] Complete: ABNB = Buy (Score: 75)
+[DebugScore] ABNB {
+  quantScore: 66,
+  riskPenalty: 0,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 78,
+  finalScore: 75
+}
+| ABNB   | 66    | 75    | Tier 2          | NO           |                                               | Tier 2         |
+[Analyzer] Starting analysis for ASTS...
+Fetching FMP: /quote?symbol=ASTS with key length: 32
+Fetching FMP: /insider-trading?symbol=ASTS&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=ASTS&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for AST SpaceMobile, Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for AST SpaceMobile, Inc. Class A Common Stock: true (CEO last name matches company name, Company < 8 years old)
+[RiskDebug] Beneish: 7.114314198342103 (WARNING - Early Stage, Rev $14.7M)
+[Analyzer] Risk check: WARNINGS (Penalty: -20) [
+  'Beneish M-Score 7.11 > -0.5 (high manipulation risk, but early stage)',
+  'Dilution rate 75.3% > 25% (high dilution)'
+]
+[Analyzer] AI analysis complete
+[CapitalEfficiency] ASML: ROE=0.52, FCF=0.29, Growth=0.23 -> BONUS APPLIED
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 50/100
+[Analyzer] AI STRONG_PASS boost: +18 (conviction=90%)
+[Analyzer] Complete: ASML = Buy (Score: 68)
+[DebugScore] ASML {
+  quantScore: 50,
+  riskPenalty: 0,
+  aiStatus: 'STRONG_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 90,
+  finalScore: 68
+}
+| ASML   | 50    | 68    | Tier 2          | NO           |                                               | Tier 1         |
+[Analyzer] Starting analysis for T...
+Fetching FMP: /quote?symbol=T with key length: 32
+Fetching FMP: /insider-trading?symbol=T&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=T&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for AT&T Inc.. Has Financials: true
+[Analyzer] Founder status for AT&T Inc.: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.5561271368292475 (PASS)
+[Analyzer] Risk check: WARNINGS (Penalty: -5) [ 'Altman Z-Score 0.54 < 1.8 (distress zone)' ]
+[Analyzer] AI analysis complete
+[CapitalEfficiency] TSLA: ROE=0.07, FCF=0.07, Growth=-0.02 -> No Bonus
+[Analyzer] Quant score: 39/100
+[BoringLargeCap] TSLA: Downgrading to MONITOR_ONLY / Not Interesting
+[BoringLargeCapDebug] TSLA: mktCap=1430667631068.3901, ROE=0.07, FCF=0.07, Growth=-0.02, isBoring=true
+[Analyzer] MONITOR_ONLY penalty: -10 (before=39, after=29)
+[Analyzer] Complete: TSLA = Pass (Score: 29)
+[DebugScore] TSLA {
+  quantScore: 39,
+  riskPenalty: 0,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Not Interesting',
+  aiConviction: 60,
+  finalScore: 29
+}
+| TSLA   | 39    | 29    | Not Interesting | NO           |                                               | Tier 1/2       |
+[Analyzer] Starting analysis for IBM...
+Fetching FMP: /quote?symbol=IBM with key length: 32
+Fetching FMP: /insider-trading?symbol=IBM&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=IBM&timeseries=365 with key length: 32
+[Analyzer] AI analysis complete
+[CapitalEfficiency] SOUN: ROE=-0.78, FCF=-0.74, Growth=1.21 -> No Bonus
+[Analyzer] Quant score: 52/100
+[Analyzer] AI SOFT_PASS boost: +9 (conviction=75%)
+[Analyzer] Complete: SOUN = Watch (Score: 56)
+[DebugScore] SOUN {
+  quantScore: 52,
+  riskPenalty: -5,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 75,
+  finalScore: 56
+}
+| SOUN   | 52    | 56    | Tier 3          | NO           | Dilution rate 14.2% > 10% (moderate dilution) | Tier 2/3       |
+[Analyzer] Starting analysis for XOM...
+Fetching FMP: /quote?symbol=XOM with key length: 32
+Fetching FMP: /insider-trading?symbol=XOM&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=XOM&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Exxon Mobil Corporation. Has Financials: true
+[Analyzer] Founder status for Exxon Mobil Corporation: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.3196554446211644 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] Financial data fetched for International Business Machines Corporation. Has Financials: true
+[Analyzer] Founder status for International Business Machines Corporation: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.2873906766133705 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] RGTI: ROE=-0.94, FCF=-9.02, Growth=-0.37 -> No Bonus
+[Analyzer] Quant score: 37/100
+[Analyzer] AI SOFT_PASS boost: +9 (conviction=75%)
+[Analyzer] Complete: RGTI = Pass (Score: 36)
+[DebugScore] RGTI {
+  quantScore: 37,
+  riskPenalty: -10,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 75,
+  finalScore: 36
+}
+| RGTI   | 37    | 36    | Not Interesting | NO           | Dilution rate 72.5% > 25% (high dilution)     | Tier 2/3       |
+[Analyzer] Starting analysis for FCX...
+Fetching FMP: /quote?symbol=FCX with key length: 32
+Fetching FMP: /insider-trading?symbol=FCX&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=FCX&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Freeport-McMoran Inc.. Has Financials: true
+[Analyzer] Founder status for Freeport-McMoran Inc.: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.3388433918543323 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] T: ROE=0.20, FCF=0.16, Growth=0.02 -> No Bonus
+[Analyzer] Quant score: 37/100
+[Analyzer] AVOID penalty: -10 (before=32, after=22)
+[Analyzer] Complete: T = Pass (Score: 22)
+[DebugScore] T {
+  quantScore: 37,
+  riskPenalty: -5,
+  aiStatus: 'AVOID',
+  aiTier: 'Not Interesting',
+  aiConviction: 90,
+  finalScore: 22
+}
+| T      | 37    | 22    | Not Interesting | NO           | Altman Z-Score 0.54 < 1.8 (distress zone)     | Not Interesting |
+[Analyzer] Starting analysis for DIS...
+Fetching FMP: /quote?symbol=DIS with key length: 32
+Fetching FMP: /insider-trading?symbol=DIS&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=DIS&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for The Walt Disney Company. Has Financials: true
+[Analyzer] Founder status for The Walt Disney Company: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.415905776577684 (PASS)
+[Analyzer] Risk check: PASSED
+[Analyzer] AI analysis complete
+[CapitalEfficiency] ASTS: ROE=-0.24, FCF=-49.43, Growth=6.41 -> No Bonus
+[Analyzer] Quant score: 47/100
+[Analyzer] AI SOFT_PASS boost: +8 (conviction=65%)
+[Analyzer] Complete: ASTS = Pass (Score: 35)
+[DebugScore] ASTS {
+  quantScore: 47,
+  riskPenalty: -20,
+  aiStatus: 'SOFT_PASS',
+  aiTier: 'Tier 2',
+  aiConviction: 65,
+  finalScore: 35
+}
+| ASTS   | 47    | 35    | Not Interesting | NO           | Beneish M-Score 7.11 > -0.5 (high manipula... | Tier 2/3       |
+[Analyzer] Starting analysis for PYPL...
+Fetching FMP: /quote?symbol=PYPL with key length: 32
+Fetching FMP: /insider-trading?symbol=PYPL&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=PYPL&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for PayPal Holdings, Inc. Common Stock. Has Financials: true
+[Analyzer] Founder status for PayPal Holdings, Inc. Common Stock: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.4380847261686083 (PASS)
+[Analyzer] Risk check: WARNINGS (Penalty: -5) [ 'Altman Z-Score 1.53 < 1.8 (distress zone)' ]
+[Analyzer] AI analysis complete
+[CapitalEfficiency] XOM: ROE=0.11, FCF=0.07, Growth=-0.04 -> No Bonus
+[Analyzer] Quant score: 40/100
+[Analyzer] MONITOR_ONLY penalty: -10 (before=40, after=30)
+[Analyzer] Complete: XOM = Pass (Score: 30)
+[DebugScore] XOM {
+  quantScore: 40,
+  riskPenalty: 0,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Not Interesting',
+  aiConviction: 85,
+  finalScore: 30
+}
+| XOM    | 40    | 30    | Not Interesting | NO           |                                               | Not Interesting |
+[Analyzer] Starting analysis for BABA...
+Fetching FMP: /quote?symbol=BABA with key length: 32
+Fetching FMP: /insider-trading?symbol=BABA&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=BABA&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Alibaba Group Holding Limited American Depositary Shares, each represents eight Ordinary Shares. Has Financials: true
+[Analyzer] Founder status for Alibaba Group Holding Limited American Depositary Shares, each represents eight Ordinary Shares: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.1618554369160057 (PASS)
+[Analyzer] Risk check: WARNINGS (Penalty: -5) [ 'Altman Z-Score 1.06 < 1.8 (distress zone)' ]
+[Analyzer] AI analysis complete
+[CapitalEfficiency] FCX: ROE=0.11, FCF=0.16, Growth=0.04 -> No Bonus
+[Analyzer] Quant score: 35/100
+[Analyzer] MONITOR_ONLY penalty: -10 (before=35, after=25)
+[Analyzer] Complete: FCX = Pass (Score: 25)
+[DebugScore] FCX {
+  quantScore: 35,
+  riskPenalty: 0,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Not Interesting',
+  aiConviction: 85,
+  finalScore: 25
+}
+| FCX    | 35    | 25    | Not Interesting | NO           |                                               | Tier 2/3       |
+[Analyzer] Starting analysis for WKHS...
+Fetching FMP: /quote?symbol=WKHS with key length: 32
+Fetching FMP: /insider-trading?symbol=WKHS&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=WKHS&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Workhorse Group, Inc. Has Financials: true
+[Analyzer] Founder status for Workhorse Group, Inc: false (No founder signals detected)
+[RiskDebug] Beneish: -3.335244097010458 (PASS)
+[RiskDebug] Altman Check: Z=-10.920975247900882, Cap=21279006.36, IsSmall=true
+[Analyzer] Risk check: FAILED (Hard Kill) [
+  'Dilution rate 659.0% > 300% (massive dilution)',
+  'Altman Z-Score -10.92 < 0 (severe distress)'
+]
+[Analyzer] Stock is DISQUALIFIED. Skipping AI analysis.
+[CapitalEfficiency] WKHS: ROE=-2.01, FCF=-3.06, Growth=0.17 -> No Bonus
+[Analyzer] Quant score: 25/100
+[Analyzer] Complete: WKHS = Disqualified (Score: 0)
+[DebugScore] WKHS {
+  quantScore: 25,
+  riskPenalty: -10,
+  aiStatus: 'AVOID',
+  aiTier: 'Disqualified',
+  aiConviction: 100,
+  finalScore: 0
+}
+| WKHS   | 25    | 0     | Disqualified    | YES          | Dilution rate 659.0% > 300% (massive dilut... | Disqualified   |
+[Analyzer] Starting analysis for RIDE...
+Fetching FMP: /quote?symbol=RIDE with key length: 32
+Fetching FMP: /insider-trading?symbol=RIDE&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=RIDE&timeseries=365 with key length: 32
+[Retry] Attempt 1 failed, retrying in 1000ms...
+[Retry] Attempt 2 failed, retrying in 2000ms...
+[Analyzer] AI analysis complete
+[CapitalEfficiency] IBM: ROE=0.28, FCF=0.20, Growth=0.05 -> No Bonus
+[Analyzer] Quant score: 52/100
+[BoringLargeCapDebug] IBM: mktCap=288440589867.48, ROE=0.28, FCF=0.20, Growth=0.05, isBoring=false
+[Analyzer] MONITOR_ONLY penalty: -10 (before=52, after=42)
+[Analyzer] Complete: IBM = Watch (Score: 42)
+[DebugScore] IBM {
+  quantScore: 52,
+  riskPenalty: 0,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Not Interesting',
+  aiConviction: 85,
+  finalScore: 42
+}
+| IBM    | 52    | 42    | Tier 3          | NO           |                                               | Not Interesting |
+[Analyzer] Starting analysis for NKLA...
+Fetching FMP: /quote?symbol=NKLA with key length: 32
+Fetching FMP: /insider-trading?symbol=NKLA&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=NKLA&timeseries=365 with key length: 32
+[Retry] Attempt 1 failed, retrying in 1000ms...
+[Analyzer] AI analysis complete
+[CapitalEfficiency] DIS: ROE=0.11, FCF=0.13, Growth=0.03 -> No Bonus
+[Analyzer] Quant score: 41/100
+[Analyzer] MONITOR_ONLY penalty: -10 (before=41, after=31)
+[Analyzer] Complete: DIS = Pass (Score: 31)
+[DebugScore] DIS {
+  quantScore: 41,
+  riskPenalty: 0,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Tier 3',
+  aiConviction: 65,
+  finalScore: 31
+}
+| DIS    | 41    | 31    | Not Interesting | NO           |                                               | Tier 2/3       |
+[Analyzer] Starting analysis for SPCE...
+Fetching FMP: /quote?symbol=SPCE with key length: 32
+Fetching FMP: /insider-trading?symbol=SPCE&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=SPCE&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Virgin Galactic Holdings, Inc.. Has Financials: true
+[Analyzer] Founder status for Virgin Galactic Holdings, Inc.: true (CEO last name matches company name)
+[RiskDebug] Beneish: -2.8896464157152506 (PASS)
+[RiskDebug] Altman Check: Z=-4.000806791914844, Cap=246480955.5, IsSmall=true
+[Analyzer] Risk check: FAILED (Hard Kill) [ 'Altman Z-Score -4.00 < 0 (severe distress)' ]
+[Analyzer] Stock is DISQUALIFIED. Skipping AI analysis.
+[CapitalEfficiency] SPCE: ROE=-1.30, FCF=-277.12, Growth=-0.82 -> No Bonus
+[Analyzer] Quant score: 25/100
+[Analyzer] Complete: SPCE = Disqualified (Score: 0)
+[DebugScore] SPCE {
+  quantScore: 25,
+  riskPenalty: -20,
+  aiStatus: 'AVOID',
+  aiTier: 'Disqualified',
+  aiConviction: 100,
+  finalScore: 0
+}
+| SPCE   | 25    | 0     | Disqualified    | YES          | Altman Z-Score -4.00 < 0 (severe distress)... | Disqualified   |
+[Retry] Attempt 2 failed, retrying in 2000ms...
+[Retry] Attempt 3 failed, retrying in 4000ms...
+[Analyzer] AI analysis complete
+[CapitalEfficiency] BABA: ROE=0.12, FCF=-0.03, Growth=0.05 -> No Bonus
+[Analyzer] Quant score: 36/100
+[Analyzer] MONITOR_ONLY penalty: -10 (before=31, after=21)
+[Analyzer] Complete: BABA = Pass (Score: 21)
+[DebugScore] BABA {
+  quantScore: 36,
+  riskPenalty: -5,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Tier 3',
+  aiConviction: 45,
+  finalScore: 21
+}
+| BABA   | 36    | 21    | Not Interesting | NO           | Altman Z-Score 1.06 < 1.8 (distress zone)     | Tier 2/3       |
+[Analyzer] AI analysis complete
+[CapitalEfficiency] PYPL: ROE=0.24, FCF=0.17, Growth=0.04 -> No Bonus
+[Analyzer] Quality Floor applied: Score boosted to 50 minimum
+[Analyzer] Quant score: 50/100
+[Analyzer] MONITOR_ONLY penalty: -10 (before=45, after=35)
+[Analyzer] Complete: PYPL = Pass (Score: 35)
+[DebugScore] PYPL {
+  quantScore: 50,
+  riskPenalty: -5,
+  aiStatus: 'MONITOR_ONLY',
+  aiTier: 'Tier 3',
+  aiConviction: 85,
+  finalScore: 35
+}
+| PYPL   | 50    | 35    | Not Interesting | NO           | Altman Z-Score 1.53 < 1.8 (distress zone)     | Tier 2/3       |
+[Retry] Attempt 3 failed, retrying in 4000ms...
+[Massive] RATE LIMIT for /v3/reference/tickers/RIDE - falling back to null data.
+[Analyzer] Financial data fetched for Lordstown Motors Corp.. Has Financials: true
+[Analyzer] Founder status for Edward T. Hightower: false (Company < 8 years old)
+[RiskDebug] Beneish: -2.427396858413078 (PASS)
+[RiskDebug] Altman Check: Z=-32.7146609350254, Cap=0, IsSmall=true
+[Analyzer] Risk check: FAILED (Hard Kill) [ 'Altman Z-Score -32.71 < 0 (severe distress)' ]
+[Analyzer] Stock is DISQUALIFIED. Skipping AI analysis.
+[CapitalEfficiency] RIDE: ROE=-0.98, FCF=0.00, Growth=-2.00 -> No Bonus
+[Analyzer] Quant score: 25/100
+[BoringLargeCapDebug] Skipping mktCap-based boring check due to missing data.
+[Analyzer] Complete: RIDE = Disqualified (Score: 0)
+[DebugScore] RIDE {
+  quantScore: 25,
+  riskPenalty: 0,
+  aiStatus: 'AVOID',
+  aiTier: 'Disqualified',
+  aiConviction: 100,
+  finalScore: 0
+}
+| RIDE   | 25    | 0     | Disqualified    | YES          | Altman Z-Score -32.71 < 0 (severe distress)   | Disqualified   |
+[Massive] RATE LIMIT for /v3/reference/tickers/NKLA - falling back to null data.
+[Analyzer] Financial data fetched for Nikola Corporation. Has Financials: true
+[Analyzer] Founder status for Stephen J. Girsky: false (Company < 8 years old)
+[RiskDebug] Beneish: -16.624857059563634 (PASS)
+[RiskDebug] Altman Check: Z=-5.280751571122048, Cap=0, IsSmall=true
+[Analyzer] Risk check: FAILED (Hard Kill) [ 'Altman Z-Score -5.28 < 0 (severe distress)' ]
+[Analyzer] Stock is DISQUALIFIED. Skipping AI analysis.
+[CapitalEfficiency] NKLA: ROE=-1.67, FCF=-7.59, Growth=1.41 -> No Bonus
+[Analyzer] Quant score: 25/100
+[BoringLargeCapDebug] Skipping mktCap-based boring check due to missing data.
+[Analyzer] Complete: NKLA = Disqualified (Score: 0)
+[DebugScore] NKLA {
+  quantScore: 25,
+  riskPenalty: -20,
+  aiStatus: 'AVOID',
+  aiTier: 'Disqualified',
+  aiConviction: 100,
+  finalScore: 0
+}
+| NKLA   | 25    | 0     | Disqualified    | YES          | Altman Z-Score -5.28 < 0 (severe distress)... | Disqualified   |
+-----------------------------------------------------------------------------------------------------------------------------
+
+[Cache Stats] { total: 268, valid: 268, expired: 0, sizeMB: '3.66' }
+
+Interpretation Guide:
+1. Winners (NVDA, etc.) should score high (Tier 1/2). If low, check if strict rules are too harsh.
+2. Disasters (WKHS, RIDE) MUST be Disqualified or Tier 3/Not Interesting.
+3. Boring stocks (T, IBM) should be Not Interesting (< 55).

@@ -4,13 +4,13 @@ config(); // Load .env
 
 async function test() {
   console.log("=== Testing APIs ===");
-  
+
   // Test FMP
   console.log("\n[FMP] Testing...");
   const fmpKey = process.env.FMP_API_KEY;
   if (fmpKey) {
     try {
-      const url = `https://financialmodelingprep.com/api/v3/quote/AAPL?apikey=${fmpKey}`;
+      const url = `https://financialmodelingprep.com/stable/quote?symbol=AAPL&apikey=${fmpKey}`;
       const res = await fetch(url);
       console.log(`Status: ${res.status}`);
       if (res.ok) {

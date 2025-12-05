@@ -1,0 +1,166 @@
+[Gemini] Using model: gemini-flash-latest
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+Running Golden Test Set Analysis...
+
+------------------------------------------------------------------------------------------------------------------
+| Ticker | Score | Tier            | Disqualified | Warnings                                      | Expected       |
+------------------------------------------------------------------------------------------------------------------
+[Analyzer] Starting analysis for NVDA...
+Fetching FMP: /profile?symbol=NVDA with key length: 32
+Fetching FMP: /quote?symbol=NVDA with key length: 32
+Fetching FMP: /income-statement?symbol=NVDA&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=NVDA&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=NVDA&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=NVDA with key length: 32
+Fetching FMP: /financial-growth?symbol=NVDA&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=NVDA&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=NVDA&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Nvidia Corp. Has Financials: true
+[Analyzer] Founder status for N/A: false (No founder signals detected)
+[Analyzer] Quant score: 65/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: NVDA = Disqualified (Score: 0)
+| NVDA   | 60    | Disqualified    | YES          | Beneish M-Score -1.01 > -1.78 (manipulatio... | Tier 1         |
+[Analyzer] Starting analysis for TSLA...
+Fetching FMP: /profile?symbol=TSLA with key length: 32
+Fetching FMP: /quote?symbol=TSLA with key length: 32
+Fetching FMP: /income-statement?symbol=TSLA&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=TSLA&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=TSLA&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=TSLA with key length: 32
+Fetching FMP: /financial-growth?symbol=TSLA&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=TSLA&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=TSLA&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Tesla, Inc. Common Stock. Has Financials: true
+[Analyzer] Founder status for N/A: false (No founder signals detected)
+[Analyzer] Quant score: 45/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: TSLA = Disqualified (Score: 0)
+| TSLA   | 39    | Disqualified    | YES          | Altman Z-Score 0.95 < 1.8 (distress zone),... | Tier 1/2       |
+[Analyzer] Starting analysis for CRWD...
+Fetching FMP: /profile?symbol=CRWD with key length: 32
+Fetching FMP: /quote?symbol=CRWD with key length: 32
+Fetching FMP: /income-statement?symbol=CRWD&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=CRWD&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=CRWD&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=CRWD with key length: 32
+Fetching FMP: /financial-growth?symbol=CRWD&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=CRWD&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=CRWD&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for CrowdStrike Holdings, Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for N/A: false (Company < 8 years old)
+[Analyzer] Quant score: 50/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: CRWD = Disqualified (Score: 0)
+| CRWD   | 58    | Disqualified    | YES          | Altman Z-Score 0.29 < 1.8 (distress zone),... | Tier 1/2       |
+[Analyzer] Starting analysis for PLTR...
+Fetching FMP: /profile?symbol=PLTR with key length: 32
+Fetching FMP: /quote?symbol=PLTR with key length: 32
+Fetching FMP: /income-statement?symbol=PLTR&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=PLTR&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=PLTR&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=PLTR with key length: 32
+Fetching FMP: /financial-growth?symbol=PLTR&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=PLTR&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=PLTR&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Palantir Technologies Inc. Class A Common Stock. Has Financials: true
+[Analyzer] Founder status for N/A: false (Company < 8 years old)
+[Analyzer] Quant score: 65/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: PLTR = Disqualified (Score: 0)
+| PLTR   | 68    | Disqualified    | YES          | Altman Z-Score 0.53 < 1.8 (distress zone),... | Tier 2         |
+[Analyzer] Starting analysis for RKLB...
+Fetching FMP: /profile?symbol=RKLB with key length: 32
+Fetching FMP: /quote?symbol=RKLB with key length: 32
+Fetching FMP: /income-statement?symbol=RKLB&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=RKLB&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=RKLB&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=RKLB with key length: 32
+Fetching FMP: /financial-growth?symbol=RKLB&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=RKLB&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=RKLB&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Rocket Lab Corporation Common Stock. Has Financials: true
+[Analyzer] Founder status for N/A: false (Company < 8 years old)
+[Analyzer] Quant score: 55/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: RKLB = Disqualified (Score: 0)
+| RKLB   | 61    | Disqualified    | YES          | Altman Z-Score -0.13 < 1.8 (distress zone)... | Tier 2/3       |
+[Analyzer] Starting analysis for WKHS...
+Fetching FMP: /profile?symbol=WKHS with key length: 32
+Fetching FMP: /quote?symbol=WKHS with key length: 32
+Fetching FMP: /income-statement?symbol=WKHS&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=WKHS&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=WKHS&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=WKHS with key length: 32
+Fetching FMP: /financial-growth?symbol=WKHS&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=WKHS&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=WKHS&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Workhorse Group, Inc. Has Financials: true
+[Analyzer] Founder status for N/A: false (No founder signals detected)
+[Analyzer] Quant score: 45/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: WKHS = Disqualified (Score: 0)
+| WKHS   | 34    | Disqualified    | YES          | Dilution rate 659.0% > 10% (excessive shar... | Disqualified   |
+[Analyzer] Starting analysis for RIDE...
+Fetching FMP: /profile?symbol=RIDE with key length: 32
+Fetching FMP: /quote?symbol=RIDE with key length: 32
+Fetching FMP: /income-statement?symbol=RIDE&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=RIDE&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=RIDE&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=RIDE with key length: 32
+Fetching FMP: /financial-growth?symbol=RIDE&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=RIDE&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=RIDE&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for Lordstown Motors Corp.. Has Financials: true
+[Analyzer] Founder status for Edward T. Hightower: false (Company < 8 years old)
+[Analyzer] Quant score: 5/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: RIDE = Disqualified (Score: 0)
+| RIDE   | 29    | Disqualified    | YES          | Altman Z-Score -32.71 < 1.8 (distress zone... | Disqualified   |
+[Analyzer] Starting analysis for T...
+Fetching FMP: /profile?symbol=T with key length: 32
+Fetching FMP: /quote?symbol=T with key length: 32
+Fetching FMP: /income-statement?symbol=T&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=T&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=T&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=T with key length: 32
+Fetching FMP: /financial-growth?symbol=T&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=T&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=T&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for AT&T Inc.. Has Financials: true
+[Analyzer] Founder status for N/A: false (No founder signals detected)
+[Analyzer] Quant score: 5/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: T = Disqualified (Score: 0)
+| T      | 41    | Disqualified    | YES          | Altman Z-Score 0.17 < 1.8 (distress zone),... | Not Interesting |
+[Analyzer] Starting analysis for IBM...
+Fetching FMP: /profile?symbol=IBM with key length: 32
+Fetching FMP: /quote?symbol=IBM with key length: 32
+Fetching FMP: /income-statement?symbol=IBM&period=quarter&limit=12 with key length: 32
+Fetching FMP: /balance-sheet-statement?symbol=IBM&period=quarter&limit=12 with key length: 32
+Fetching FMP: /cash-flow-statement?symbol=IBM&period=quarter&limit=12 with key length: 32
+Fetching FMP: /key-metrics-ttm?symbol=IBM with key length: 32
+Fetching FMP: /financial-growth?symbol=IBM&limit=1 with key length: 32
+Fetching FMP: /insider-trading?symbol=IBM&limit=50 with key length: 32
+Fetching FMP: /historical-price-full?symbol=IBM&timeseries=365 with key length: 32
+[Analyzer] Financial data fetched for International Business Machines Corporation. Has Financials: true
+[Analyzer] Founder status for N/A: false (No founder signals detected)
+[Analyzer] Quant score: 20/100
+[Analyzer] Risk check: FAILED
+[Analyzer] AI analysis complete
+[Analyzer] Complete: IBM = Disqualified (Score: 0)
+| IBM    | 56    | Disqualified    | YES          | Altman Z-Score 1.60 < 1.8 (distress zone),... | Not Interesting |
+------------------------------------------------------------------------------------------------------------------
+
+Interpretation Guide:
+1. Winners (NVDA, etc.) should score high (Tier 1/2). If low, check if strict rules are too harsh.
+2. Disasters (WKHS, RIDE) MUST be Disqualified or Tier 3/Not Interesting.
+3. Boring stocks (T, IBM) should be Not Interesting (< 55).
