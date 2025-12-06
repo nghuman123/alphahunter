@@ -4,9 +4,9 @@
  * NO AI INVOLVED - Pure math
  */
 
-import type { 
-  IncomeStatement, 
-  BalanceSheet, 
+import type {
+  IncomeStatement,
+  BalanceSheet,
   InsiderTrade,
   KeyMetrics,
   FinancialGrowth,
@@ -30,15 +30,15 @@ const calculateCAGR = (startValue: number, endValue: number, years: number): num
  */
 const calculateTrend = (values: number[]): 'Expanding' | 'Stable' | 'Contracting' => {
   if (values.length < 2) return 'Stable';
-  
+
   const firstHalf = values.slice(0, Math.floor(values.length / 2));
   const secondHalf = values.slice(Math.floor(values.length / 2));
-  
+
   const avgFirst = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
   const avgSecond = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
-  
+
   const change = ((avgSecond - avgFirst) / Math.abs(avgFirst)) * 100;
-  
+
   if (change > 2) return 'Expanding';
   if (change < -2) return 'Contracting';
   return 'Stable';
@@ -59,12 +59,12 @@ export const calculateGrowthScore = (
   financialGrowth: FinancialGrowth | null,
   finnhubMetrics?: FinnhubMetrics | null
 ): { score: number; cagr3yr: number; lastQuarterGrowth: number; accelerating: boolean } => {
-  
+
   // Use FMP's pre-calculated 3-year growth if available
-  let cagr3yr = financialGrowth?.threeYRevenueGrowthPerShare 
-    ? financialGrowth.threeYRevenueGrowthPerShare * 100 
+  let cagr3yr = financialGrowth?.threeYRevenueGrowthPerShare
+    ? financialGrowth.threeYRevenueGrowthPerShare * 100
     : 0;
-  
+
   // Fallback 1: Calculate from income statements
   if (!cagr3yr && incomeStatements.length >= 12) {
     const oldestRevenue = incomeStatements[11]?.revenue || 0;
@@ -76,7 +76,7 @@ export const calculateGrowthScore = (
   if (!cagr3yr && finnhubMetrics?.revenueGrowth3Y) {
     cagr3yr = finnhubMetrics.revenueGrowth3Y;
   }
-  
+
   // Calculate last quarter YoY growth
   let lastQuarterGrowth = 0;
   if (incomeStatements.length >= 5) {
@@ -86,22 +86,22 @@ export const calculateGrowthScore = (
       lastQuarterGrowth = ((currentQ - yearAgoQ) / yearAgoQ) * 100;
     }
   } else if (finnhubMetrics?.revenueGrowth5Y) {
-     // Rough proxy if we don't have quarterly data: compare 3Y vs 5Y? 
-     // Or just assume 0 for last quarter specific growth if we can't calculate it.
-     // Let's just use 0 to be safe, or maybe use the 3Y average as a proxy for "current" growth state.
-     lastQuarterGrowth = cagr3yr;
+    // Rough proxy if we don't have quarterly data: compare 3Y vs 5Y? 
+    // Or just assume 0 for last quarter specific growth if we can't calculate it.
+    // Let's just use 0 to be safe, or maybe use the 3Y average as a proxy for "current" growth state.
+    lastQuarterGrowth = cagr3yr;
   }
-  
+
   // Score calculation
   let score = 0;
   if (cagr3yr > 30) score = 30;
   else if (cagr3yr > 20) score = 20;
   else if (cagr3yr > 15) score = 10;
-  
+
   // Acceleration bonus
   const accelerating = lastQuarterGrowth > cagr3yr && cagr3yr > 0;
   if (accelerating) score = Math.min(30, score + 5);
-  
+
   return { score, cagr3yr, lastQuarterGrowth, accelerating };
 };
 
@@ -119,41 +119,41 @@ export const calculateQualityScore = (
   sector: SectorType,
   finnhubMetrics?: FinnhubMetrics | null
 ): { score: number; grossMargin: number; trend: 'Expanding' | 'Stable' | 'Contracting' } => {
-  
+
   let currentGM = 0;
   let trend: 'Expanding' | 'Stable' | 'Contracting' = 'Stable';
 
   if (incomeStatements.length > 0) {
     // Get current gross margin
     currentGM = (incomeStatements[0]?.grossProfitRatio || 0) * 100;
-    
+
     // Get margin trend (last 8 quarters)
     const margins = incomeStatements
       .slice(0, 8)
       .map(s => s.grossProfitRatio * 100)
       .reverse(); // Oldest to newest
-    
+
     trend = calculateTrend(margins);
   } else if (finnhubMetrics?.grossMargin) {
     currentGM = finnhubMetrics.grossMargin;
     // Cannot determine trend from single point, assume Stable
     trend = 'Stable';
   }
-  
+
   // Score based on sector threshold
   let score = 0;
   const isSoftware = ['SaaS', 'FinTech', 'Other'].includes(sector);
   const threshold = isSoftware ? 70 : 40;
-  
+
   if (currentGM >= threshold) score += 15;
   else if (currentGM >= threshold * 0.8) score += 10;
   else if (currentGM >= threshold * 0.6) score += 5;
-  
+
   // Trend adjustment
   if (trend === 'Expanding') score += 10;
   else if (trend === 'Stable') score += 5;
   else score -= 5;
-  
+
   return { score: Math.max(0, Math.min(25, score)), grossMargin: currentGM, trend };
 };
 
@@ -171,10 +171,10 @@ export const calculateRuleOf40Score = (
   financialGrowth: FinancialGrowth | null,
   finnhubMetrics?: FinnhubMetrics | null
 ): { score: number; value: number; revenueGrowth: number; ebitdaMargin: number } => {
-  
+
   // Get revenue growth (YoY)
   let revenueGrowth = (financialGrowth?.revenueGrowth || 0) * 100;
-  
+
   // Get EBITDA margin
   let ebitdaMargin = (incomeStatements[0]?.ebitdaratio || 0) * 100;
 
@@ -186,15 +186,15 @@ export const calculateRuleOf40Score = (
     // Operating Margin is a decent proxy for EBITDA margin if EBITDA isn't available
     ebitdaMargin = finnhubMetrics.operatingMargin;
   }
-  
+
   const ruleOf40Value = revenueGrowth + ebitdaMargin;
-  
+
   let score = 0;
   if (ruleOf40Value > 50) score = 20;
   else if (ruleOf40Value > 40) score = 15;
   else if (ruleOf40Value > 30) score = 10;
   else if (ruleOf40Value > 20) score = 5;
-  
+
   return { score, value: ruleOf40Value, revenueGrowth, ebitdaMargin };
 };
 
@@ -208,16 +208,16 @@ export const calculateInsiderScore = (
   insiderTrades: InsiderTrade[],
   founderLed: boolean,
   insiderOwnershipPct: number
-): { score: number; netBuying90Days: number } => {
-  
+): { score: number; netBuying180Days: number } => {
+
   // Calculate net buying in last 90 days
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-  
+  const oneEightyDaysAgo = new Date();
+  oneEightyDaysAgo.setDate(oneEightyDaysAgo.getDate() - 180);
+
   let netBuying = 0;
   insiderTrades.forEach(trade => {
     const tradeDate = new Date(trade.transactionDate);
-    if (tradeDate >= ninetyDaysAgo) {
+    if (tradeDate >= oneEightyDaysAgo) {
       if (trade.transactionType.includes('P')) {
         netBuying += trade.value || 0;
       } else if (trade.transactionType.includes('S')) {
@@ -225,13 +225,13 @@ export const calculateInsiderScore = (
       }
     }
   });
-  
+
   let score = 0;
   if (founderLed) score += 10;
   if (insiderOwnershipPct > 10) score += 5;
   if (netBuying > 500000) score += 5;
-  
-  return { score: Math.min(15, score), netBuying90Days: netBuying };
+
+  return { score: Math.min(15, score), netBuying180Days: netBuying };
 };
 
 /**
@@ -246,20 +246,20 @@ export const calculateValuationScore = (
   priceToSales: number,
   revenueGrowthPct: number
 ): { score: number; psgRatio: number } => {
-  
+
   // Avoid division by zero
   if (revenueGrowthPct <= 0) {
     return { score: 0, psgRatio: Infinity };
   }
-  
+
   // Convert growth to decimal for ratio
   const psgRatio = priceToSales / revenueGrowthPct;
-  
+
   let score = 0;
   if (psgRatio < 0.3) score = 10;
   else if (psgRatio < 0.5) score = 7;
   else if (psgRatio < 1.0) score = 4;
-  
+
   return { score, psgRatio };
 };
 
@@ -275,20 +275,20 @@ export const calculateQuantitativeScore = (
   insiderOwnershipPct: number,
   finnhubMetrics?: FinnhubMetrics | null
 ): QuantitativeScore => {
-  
+
   const growth = calculateGrowthScore(incomeStatements, financialGrowth, finnhubMetrics);
   const quality = calculateQualityScore(incomeStatements, sector, finnhubMetrics);
   const ruleOf40 = calculateRuleOf40Score(incomeStatements, financialGrowth, finnhubMetrics);
   const insider = calculateInsiderScore(insiderTrades, founderLed, insiderOwnershipPct);
-  
+
   const priceToSales = keyMetrics?.priceToSalesRatio || 0;
   // If we don't have P/S, we can't calculate valuation score accurately.
   // We could try to infer it if we had Market Cap and Revenue, but for now let's just use what we have.
-  
+
   const valuation = calculateValuationScore(priceToSales, growth.cagr3yr);
-  
+
   const compositeScore = growth.score + quality.score + ruleOf40.score + insider.score + valuation.score;
-  
+
   return {
     growthScore: growth.score,
     qualityScore: quality.score,
@@ -296,7 +296,7 @@ export const calculateQuantitativeScore = (
     insiderScore: insider.score,
     valuationScore: valuation.score,
     compositeScore,
-    
+
     revenueGrowth3YrCAGR: growth.cagr3yr,
     lastQuarterGrowth: growth.lastQuarterGrowth,
     grossMargin: quality.grossMargin,
@@ -304,7 +304,7 @@ export const calculateQuantitativeScore = (
     ruleOf40Value: ruleOf40.value,
     insiderOwnershipPct,
     founderLed,
-    netInsiderBuying90Days: insider.netBuying90Days,
+    netInsiderBuying180Days: insider.netBuying180Days,
     priceToSales,
     psgRatio: valuation.psgRatio
   };

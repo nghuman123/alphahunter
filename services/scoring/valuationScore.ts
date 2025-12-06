@@ -30,6 +30,12 @@ function calcGrowthRateForValuation(metrics: {
 }
 
 export function calcValuationScore(metrics: ValuationMetrics): number {
+    // [TASK 3] Safety Valve for Bubble Valuations
+    if (metrics.ps && metrics.ps > 50) {
+        console.log(`[Valuation] Safety Valve: P/S ${metrics.ps} > 50 -> Score: -10`);
+        return -10;
+    }
+
     const growth = calcGrowthRateForValuation(metrics); // 0.20 = 20%
 
     if (!growth || growth <= 0.05) {

@@ -356,7 +356,7 @@ export interface QuantitativeScore {
   ruleOf40Value: number;
   insiderOwnershipPct: number;
   founderLed: boolean;
-  netInsiderBuying90Days: number;
+  netInsiderBuying180Days: number;
   priceToSales: number;
   psgRatio: number;
 }

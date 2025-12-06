@@ -83,6 +83,33 @@ const run = async () => {
     });
 
     console.log('\n' + table.toString());
+
+    // [TASK 4] Portfolio Allocation Table
+    if (results.length > 0) {
+        console.log(`\n🏆 TOP 20 PORTFOLIO ALLOCATION`);
+        const portfolioTable = new Table({
+            head: ['Ticker', 'Score', 'Alloc %'],
+            colWidths: [15, 10, 15]
+        });
+
+        // Filter for investable tiers (Tier 1 & Tier 2)
+        const investable = results.filter((pd: any) => pd.overallTier === 'Tier 1' || pd.overallTier === 'Tier 2');
+        const top20 = investable.slice(0, 20);
+
+        if (top20.length > 0) {
+            const totalScoreSum = top20.reduce((sum: number, r: any) => sum + r.finalScore, 0);
+
+            top20.forEach((r: any) => {
+                const weight = (r.finalScore / totalScoreSum) * 100;
+                portfolioTable.push([r.ticker, r.finalScore.toString(), weight.toFixed(2) + '%']);
+            });
+
+            console.log(portfolioTable.toString());
+        } else {
+            console.log("No Tier 1 or Tier 2 stocks found for portfolio allocation.");
+        }
+    }
+
     console.log(`\n📊 SCAN COMPLETE: Scanned ${results.length} stocks.`);
 };
 

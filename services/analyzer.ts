@@ -81,38 +81,8 @@ function buildWarningCatalystSummary(params: {
 
 
 // Founder Led Override Map (Source of Truth)
-const FOUNDER_LED_OVERRIDE: Record<string, boolean> = {
-  NVDA: true,
-  CRWD: true,
-  DDOG: true,
-  PLTR: true,
-  ZS: true,
-  FTNT: true,
-  SHOP: true,
-  RKLB: true,
-  ABNB: true,
-  RGTI: true,
-  ASTS: true,
-  SOUN: true,
-  TSLA: true,
-  // Explicitly *false* for old blue chips:
-  MSFT: false,
-  AAPL: false,
-  IBM: false,
-  XOM: false,
-  DIS: false,
-  T: false,
-  COST: false,
-  BABA: false,
-  PYPL: false,
-  FCX: false,
-  SPCE: true, // Richard Branson
-  NKLA: false, // Trevor Milton is gone/fraud
-  RIDE: false,
-  WKHS: false,
-  SNOW: false, // Frank Slootman is not founder (Sutter/Dageville are, but Slootman was key CEO) - actually Dageville is still there. Let's say False for CEO check.
-  PANW: true, // Nikesh Arora is not founder, but Nir Zuk is CTO/Founder. This is tricky. Let's stick to CEO check or manual override. Nir Zuk is active. Let's say True.
-};
+// [REMOVED] Hardcoded Founder Override List
+
 
 // [NEW] Helper: Calculate Moat/Insider Score from Antigravity Report
 function calcMoatInsiderScore(report: AntigravityResult): number {
@@ -424,29 +394,21 @@ export const analyzeStock = async (ticker: string): Promise<MultiBaggerAnalysis 
 
   let founderCheck = { isFounder: false, reason: "No founder signals detected" };
 
-  // 1. Check Override Map first
-  if (FOUNDER_LED_OVERRIDE[ticker] !== undefined) {
-    founderCheck = {
-      isFounder: FOUNDER_LED_OVERRIDE[ticker],
-      reason: `Manual Override for ${ticker}`
-    };
-  } else {
-    // 2. Heuristic Check
-    // [FIX] Do NOT fallback to companyName if CEO is missing, that causes false positives (e.g. "Microsoft" == "Microsoft")
-    const ceoName = (profile.ceo && profile.ceo !== "N/A" && profile.ceo !== "null")
-      ? profile.ceo
-      : null;
+  // 2. Heuristic Check
+  // [FIX] Do NOT fallback to companyName if CEO is missing, that causes false positives (e.g. "Microsoft" == "Microsoft")
+  const ceoName = (profile.ceo && profile.ceo !== "N/A" && profile.ceo !== "null")
+    ? profile.ceo
+    : null;
 
-    if (ceoName) {
-      founderCheck = detectFounderStatus(
-        ceoName,
-        profile.companyName,
-        profile.description,
-        companyAge
-      );
-    } else {
-      founderCheck = { isFounder: false, reason: "CEO name unavailable" };
-    }
+  if (ceoName) {
+    founderCheck = detectFounderStatus(
+      ceoName,
+      profile.companyName,
+      profile.description,
+      companyAge
+    );
+  } else {
+    founderCheck = { isFounder: false, reason: "CEO name unavailable" };
   }
 
   console.log(`[Analyzer] Founder status for ${ticker}: ${founderCheck.isFounder} (${founderCheck.reason})`);
@@ -477,7 +439,7 @@ export const analyzeStock = async (ticker: string): Promise<MultiBaggerAnalysis 
       ruleOf40Value: 0,
       insiderOwnershipPct: 0,
       founderLed: false,
-      netInsiderBuying90Days: 0,
+      netInsiderBuying180Days: 0,
       priceToSales: 0,
       psgRatio: 0,
       growthScore: 0,
@@ -599,6 +561,13 @@ export const analyzeStock = async (ticker: string): Promise<MultiBaggerAnalysis 
       })
     ]);
     console.log(`[Analyzer] AI analysis complete`);
+  }
+
+  // [TASK 1] AI Override for Founder Led
+  if (antigravityReport?.founderLed === true) {
+    founderCheck.isFounder = true;
+    founderCheck.reason = "AI Confirmed Founder-Led";
+    console.log(`[Analyzer] Founder status updated by AI: TRUE`);
   }
 
   // STEP 7: MultiBagger Score
